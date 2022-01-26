@@ -1,0 +1,41 @@
+---
+
+- name: Install sssd
+  yum:
+    name: "sssd"
+    state: present
+
+- name: Update pam.d/system-auth
+  template:
+    src: system-auth.j2
+    dest: /etc/pam.d/system-auth
+
+- name: Update pam.d/password-auth
+  template:
+    src: password-auth.j2
+    dest: /etc/pam.d/password-auth
+
+- name: Setup sssd.conf
+  template:
+    src: sssd.conf.j2
+    dest: /etc/sssd/sssd.conf
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - 'restart sssd'
+
+- name: start ssssd
+  service:
+    enabled: 'yes'
+    name: "sssd"
+    state: started
+
+- name: Allow global ssh login
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^#?PasswordAuthentication.+$"
+    line: "PasswordAuthentication yes"
+    state: present
+  notify:
+      - 'restart sshd'

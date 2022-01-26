@@ -1,0 +1,4 @@
+---
+
+sssd_realm: 'EXAMPLE.COM'
+kdc_server: 'kdc{{ sssd_realm | lower() }}'
